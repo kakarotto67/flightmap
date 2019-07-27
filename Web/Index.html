@@ -19,7 +19,12 @@
     <!-- Promis based http client. https://github.com/axios/axios -->
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
+    <!-- Add a reference to ASP.NET Core SignalR JavaScript client library. -->
+    <script src="https://unpkg.com/@aspnet/signalr@1.0.2/dist/browser/signalr.js"></script>
+
     <script>
+      const baseUrl = "http://localhost:7071";
+
       // Gets Azure Maps and loads in specified id
       function GetMap() {
         // 1. Instantiate a map object
@@ -48,7 +53,7 @@
             "https://i.imgur.com/AKUIMiW.png"
           );
 
-          // Create a data source and add it to the map
+          // Initiazlie a data source and add it to the map
           var datasource = new atlas.source.DataSource();
           map.sources.add(datasource);
 
@@ -69,6 +74,45 @@
               }
             })
           );
+
+          // Get SignalR connection info
+          // Create connection with SignalR using connection info
+          // Start SignlarR connection
+          // Handle newFlightData SignalR message target
+          //   GetConnectionInfo()
+          //     .then(function(info) {
+          //       let accessToken = info.accessToken;
+          //       const options = {
+          //         accessTokenFactory: function() {
+          //           if (accessToken) {
+          //             const _accessToken = accessToken;
+          //             accessToken = null;
+          //             return _accessToken;
+          //           } else {
+          //             return GetConnectionInfo().then(function(info) {
+          //               return info.accessToken;
+          //             });
+          //           }
+          //         }
+          //       };
+
+          //       const connection = new signalR.HubConnectionBuilder()
+          //         .withUrl(info.url, options)
+          //         .build();
+
+          //       StartConnection(connection);
+
+          //       // Bind ProcessFlightData handler to newFlightData SignalR message target
+          //       connection.on("newFlightData", ProcessFlightData);
+
+          //       connection.onclose(function() {
+          //         console.log("disconnected");
+          //         setTimeout(function() {
+          //           StartConnection(connection);
+          //         }, 5000);
+          //       });
+          //     })
+          //     .catch(console.error);
 
           // Get flight data from the API.
           // And then go through each flight, create shape for it and add to data source
@@ -99,6 +143,52 @@
           })
           .catch(console.error);
       }
+
+      //   let datasource;
+      //   let planes = [];
+
+      // Create new shape of fligh data and add it to datasource
+      //   function ProcessFlightData(flight) {
+      //     console.log(flight);
+
+      //     var newFlightPin = new atlas.Shape(
+      //       new atlas.data.Point([flight.longitute, flight.latitude]),
+      //       flight.id
+      //     );
+
+      //     newFlightPin.addProperty("name", flight.callsign);
+      //     newFlightPin.addProperty("altitude", flight.altitude);
+      //     newFlightPin.addProperty("rotation", flight.trueTrack);
+
+      //     planes[flight.id] = newFlightPin;
+      //     datasource.setShapes(Object.values(planes));
+      //   }
+
+      //   // Get connection info to SignalR posted by Azure Function
+      //   function GetConnectionInfo() {
+      //     return axios
+      //       .get(baseUrl + "/api/negotiate")
+      //       .then(function(response) {
+      //         return response.data;
+      //       })
+      //       .catch(console.error);
+      //   }
+
+      //   // Initiate connectin with SignalR
+      //   function StartConnection(connection) {
+      //     console.log("connecting...");
+      //     connection
+      //       .start()
+      //       .then(function() {
+      //         console.log("connected!");
+      //       })
+      //       .catch(function(err) {
+      //         console.error(err);
+      //         setTimeout(function() {
+      //           StartConnection(connection);
+      //         }, 2000);
+      //       });
+      //   }
     </script>
 
     <style>

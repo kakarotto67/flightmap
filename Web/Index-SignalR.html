@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Live Flight Data Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Add references to the Azure Maps Map control JavaScript and CSS files. -->
+    <link
+      rel="stylesheet"
+      href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css"
+      type="text/css"
+    />
+    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
+
+    <!-- Add a reference to the Azure Maps Services Module JavaScript file. -->
+    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas-service.min.js"></script>
+
+    <!-- Promis based http client. https://github.com/axios/axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/@aspnet/signalr@1.0.2/dist/browser/signalr.js"></script>
+
+    <script>
+      const baseurl = "http://localhost:7071";
+      //const baseurl = 'https://dt-flightdata-fn.azurewebsites.net';
+
+      function GetMap() {
+        //Instantiate a map object
+        var map = new atlas.Map("myMap", {
+          //Add your Azure Maps subscription key to the map SDK. Get an Azure Maps key at https://azure.com/maps
+          authOptions: {
+            authType: "subscriptionKey",
+            subscriptionKey: "wa-nLkxGfvYaOtaUGF6hASolcGC2lvwsQn25P4bg-ac"
+          },
+          style: "night",
+          center: [172.0, -40.0],
+          zoom: 5
+        });
+
+        //Wait until the map resources are ready.
+        map.events.add("ready", function() {
+          map.imageSprite.add("plane-icon", "https://i.imgur.com/AKUIMiW.png");
+          //Create a data source and add it to the map
+          datasource = new atlas.source.DataSource();
+          map.sources.add(datasource);
+          //Create a symbol layer using the data source and add it to the map
+          map.layers.add(
+            new atlas.layer.SymbolLayer(datasource, null, {
+              iconOptions: {
+                ignorePlacement: true,
+                allowOverlap: true,
+                image: "plane-icon",
+                size: 0.08,
+                rotation: ["get", "rotation"]
+              },
+              textOptions: {
+                textField: ["concat", ["to-string", ["get", "name"]], "- ", ["get", "altitude"]],
+                color: "#FFFFFF",
+                offset: [2, 0]
+              }
+            })
+          );
+
+          GetConnectionInfo()
+            .then(function(info) {
+              let accessToken = info.accessToken;
+              const options = {
+                accessTokenFactory: function() {
+                  if (accessToken) {
+                    const _accessToken = accessToken;
+                    accessToken = null;
+                    return _accessToken;
+                  } else {
+                    return GetConnectionInfo().then(function(info) {
+                      return info.accessToken;
+                    });
+                  }
+                }
+              };
+
+              const connection = new signalR.HubConnectionBuilder()
+                .withUrl(info.url, options)
+                //.configureLogging(signalR.LogLevel.Trace)
+                .build();
+
+              StartConnection(connection);
+
+              connection.on("newFlightData", ProcessFlightData);
+
+              connection.onclose(function() {
+                console.log("disconnected");
+                setTimeout(function() {
+                  StartConnection(connection);
+                }, 5000);
+              });
+            })
+            .catch(console.error);
+        });
+      }
+
+      let datasource;
+      let planes = [];
+
+      function ProcessFlightData(flight) {
+        console.log(flight);
+        var newFlightPin = new atlas.Shape(
+          new atlas.data.Point([flight.longitute, flight.latitude]),
+          flight.id
+        );
+        newFlightPin.addProperty("name", flight.callsign);
+        newFlightPin.addProperty("altitude", flight.altitude);
+        newFlightPin.addProperty("rotation", flight.trueTrack);
+        planes[flight.id] = newFlightPin;
+        datasource.setShapes(Object.values(planes));
+      }
+
+      function GetConnectionInfo() {
+        return axios
+          .get(baseurl + "/api/negotiate")
+          .then(function(response) {
+            return response.data;
+          })
+          .catch(console.error);
+      }
+
+      function StartConnection(connection) {
+        console.log("connecting...");
+        connection
+          .start()
+          .then(function() {
+            console.log("connected!");
+          })
+          .catch(function(err) {
+            console.error(err);
+            setTimeout(function() {
+              StartConnection(connection);
+            }, 2000);
+          });
+      }
+    </script>
+
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+      #myMap {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+
+  <body onload="GetMap()">
+    <div id="myMap"></div>
+  </body>
+</html>

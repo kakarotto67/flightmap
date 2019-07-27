@@ -36,6 +36,8 @@ namespace FlightDataFunctionApp
                   Target = "newFlightData",
                   Arguments = new[] { flight }
                });
+
+               log.LogInformation($"flight added: {flight}");
             }
          }
       }
