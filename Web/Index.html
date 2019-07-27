@@ -16,20 +16,88 @@
     <!-- Add a reference to the Azure Maps Services Module JavaScript file. -->
     <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas-service.min.js"></script>
 
+    <!-- Promis based http client. https://github.com/axios/axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
     <script>
+      // Gets Azure Maps and loads in specified id
       function GetMap() {
-        // Instantiate a map object
-        var map = new atlas.Map("myMap", {
+        // 1. Instantiate a map object
+        var map = new atlas.Map("AzureMapContainerId", {
           // Use Azure Maps subscription key to the map SDK. Get an Azure Maps key at https://azure.com/maps
           authOptions: {
             authType: "subscriptionKey",
             subscriptionKey: "wa-nLkxGfvYaOtaUGF6hASolcGC2lvwsQn25P4bg-ac"
           },
-          style: "day",
-          //center: [171.7799, -40.838875], // New Zealand
-          center: [31.7233, 48.4792], // Ukraine
+          style: "night",
+          // Note: [longitude, latitude] (in google maps vise versa)
+          // For New Zealand
+          //center: [171.7799, -40.838875],
+          // For Ukraine
+          center: [31.7233, 48.4792],
           zoom: 5
         });
+
+        // 2. Wait until the map resources are ready.
+        map.events.add("ready", function() {
+          // Add plane icon from Azure Blobs
+          map.imageSprite.add(
+            "plane-icon",
+            // ISSUE: Azure Blob blocked by CORS
+            //"https://flightmapblobstorage.blob.core.windows.net/maincontainer/plane.png"
+            "https://i.imgur.com/VPlxF8s.png"
+          );
+
+          // Create a data source and add it to the map
+          var datasource = new atlas.source.DataSource();
+          map.sources.add(datasource);
+
+          // Create a symbol layer using the data source and add it to the map
+          map.layers.add(
+            new atlas.layer.SymbolLayer(datasource, null, {
+              iconOptions: {
+                ignorePlacement: true,
+                allowOverlap: true,
+                image: "plane-icon",
+                size: 0.6,
+                rotation: ["get", "rotation"]
+              },
+              textOptions: {
+                textField: ["concat", ["to-string", ["get", "name"]], "- ", ["get", "altitude"]],
+                color: "#FFFFFF",
+                offset: [2, 0]
+              }
+            })
+          );
+
+          // Get flight data from the API.
+          // And then go through each flight, create shape for it and add to data source
+          // that will be displayed on the map.
+          GetFlightData().then(function(response) {
+            for (var flight of response.data.states) {
+              var pin = new atlas.Shape(new atlas.data.Point([flight[5], flight[6]]));
+              pin.addProperty("name", flight[1]);
+              pin.addProperty("altitude", flight[7]);
+              pin.addProperty("rotation", flight[10]);
+              datasource.add(pin);
+            }
+          });
+        });
+      }
+
+      // Gets real time flight data from OpenSky Network API
+      function GetFlightData() {
+        return axios
+          .get(
+            // For New Zealand
+            //"https://opensky-network.org/api/states/all?lamin=-50.00&lomin=160.00&lamax=-30.00&lomax=180.00"
+            // For Ukraine
+            "https://opensky-network.org/api/states/all?lamin=44.00&lomin=22.00&lamax=52.00&lomax=40.00"
+          )
+          .then(function(response) {
+            return response;
+          })
+          .catch(console.error);
       }
     </script>
 
@@ -42,13 +110,13 @@
         margin: 0;
       }
 
-      #myMap {
+      #AzureMapContainerId {
         width: 100%;
         height: 100%;
       }
     </style>
   </head>
   <body onload="GetMap()">
-    <div id="myMap"></div>
+    <div id="AzureMapContainerId"></div>
   </body>
 </html>
