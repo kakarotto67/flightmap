@@ -1,39 +1,54 @@
 <!DOCTYPE html>
- <html>
- <head>
-     <title>Live Flight Data Map</title>
-     <meta charset="utf-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<html>
+  <head>
+    <title>Live Flight Data Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
-     <!-- Add references to the Azure Maps Map control JavaScript and CSS files. -->
-     <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css" type="text/css">
-     <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
+    <!-- Add references to the Azure Maps Map control JavaScript and CSS files. -->
+    <link
+      rel="stylesheet"
+      href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css"
+      type="text/css"
+    />
+    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
 
-     <!-- Add a reference to the Azure Maps Services Module JavaScript file. -->
-     <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas-service.min.js"></script>
+    <!-- Add a reference to the Azure Maps Services Module JavaScript file. -->
+    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas-service.min.js"></script>
 
-     <script>
-     function GetMap(){
-         // Add Map Control JavaScript code here.
-     }
-     </script>
+    <script>
+      function GetMap() {
+        // Instantiate a map object
+        var map = new atlas.Map("myMap", {
+          // Use Azure Maps subscription key to the map SDK. Get an Azure Maps key at https://azure.com/maps
+          authOptions: {
+            authType: "subscriptionKey",
+            subscriptionKey: "wa-nLkxGfvYaOtaUGF6hASolcGC2lvwsQn25P4bg-ac"
+          },
+          style: "day",
+          //center: [171.7799, -40.838875], // New Zealand
+          center: [31.7233, 48.4792], // Ukraine
+          zoom: 5
+        });
+      }
+    </script>
 
-     <style>
-         html,
-         body {
-             width: 100%;
-             height: 100%;
-             padding: 0;
-             margin: 0;
-         }
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
 
-         #myMap {
-             width: 100%;
-             height: 100%;
-         }
-     </style>
- </head>
- <body onload="GetMap()">
-     <div id="myMap"></div>
- </body>
- </html>
+      #myMap {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body onload="GetMap()">
+    <div id="myMap"></div>
+  </body>
+</html>
