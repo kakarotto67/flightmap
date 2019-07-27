@@ -19,7 +19,7 @@ namespace FlightDataFunctionApp
           [CosmosDB(
             databaseName: "flightmap-db",
             collectionName: "flightmap-container",
-            ConnectionStringSetting = "AzureCosmosDBConnection")]IAsyncCollector<Flight> cosmosDbContainer,
+            ConnectionStringSetting = "AzureCosmosDBConnection")]IAsyncCollector<Flight> document,
          ILogger log)
       {
          log.LogInformation($"C# Timer trigger function executed at: {DateTime.UtcNow}");
@@ -33,7 +33,7 @@ namespace FlightDataFunctionApp
                var result = JsonConvert.DeserializeObject<Rootobject>(await content.ReadAsStringAsync());
                foreach (var item in result.states)
                {
-                  await cosmosDbContainer.AddAsync(Flight.CreateFromData(item));
+                  await document.AddAsync(Flight.CreateFromData(item));
                }
 
                log.LogInformation($"Total flights processed{result.states.Length}");
