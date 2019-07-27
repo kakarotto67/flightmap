@@ -15,7 +15,7 @@ namespace FlightDataFunctionApp
       [FunctionName("Negotiate")]
       public static IActionResult Run(
          [HttpTrigger(AuthorizationLevel.Anonymous)] HttpRequest req,
-         [SignalRConnectionInfo(HubName = "flightdata")] SignalRConnectionInfo connectionInfo,
+         [SignalRConnectionInfo(HubName = "flightmap")] SignalRConnectionInfo connectionInfo,
          ILogger log)
       {
          return new OkObjectResult(connectionInfo);

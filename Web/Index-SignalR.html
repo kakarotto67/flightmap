@@ -80,6 +80,7 @@
 
               const connection = new signalR.HubConnectionBuilder()
                 .withUrl(info.url, options)
+                //.withUrl(info.url)
                 //.configureLogging(signalR.LogLevel.Trace)
                 .build();
 

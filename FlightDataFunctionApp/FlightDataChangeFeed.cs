@@ -20,7 +20,7 @@ namespace FlightDataFunctionApp
             ConnectionStringSetting = "AzureCosmosDBConnection",
             LeaseCollectionName = "leases",
             CreateLeaseCollectionIfNotExists = true)]IReadOnlyList<Document> input,
-         [SignalR(HubName = "flightdata")] IAsyncCollector<SignalRMessage> signalRMessages,
+         [SignalR(HubName = "flightmap")] IAsyncCollector<SignalRMessage> signalRMessages,
          ILogger log)
       {
          if (input != null && input.Count > 0)

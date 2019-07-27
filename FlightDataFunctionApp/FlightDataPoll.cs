@@ -15,7 +15,7 @@ namespace FlightDataFunctionApp
       private static readonly HttpClient client = new HttpClient();
 
       [FunctionName("FlightDataPoll")]
-      public static async Task RunAsync([TimerTrigger("*/5 * * * * *")]TimerInfo myTimer,
+      public static async Task RunAsync([TimerTrigger("*/10 * * * * *")]TimerInfo myTimer,
           [CosmosDB(
             databaseName: "flightmap-db",
             collectionName: "flightmap-container",
