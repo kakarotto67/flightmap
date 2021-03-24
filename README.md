@@ -5,6 +5,8 @@ Stack:
 - Azure Maps
 - Azure SignalR
 - Azure Functions
-- Cosmos DB
+- Azure Cosmos DB
 
-Original link - https://davetheunissen.io/real-time-flight-map-w-azure-functions-cosmosdb-signalr/
+# Setup
+Original link - https://davetheunissen.io/real-time-flight-map-w-azure-functions-cosmosdb-signalr/ (not working anymore)
+Web archieve link - http://web.archive.org/web/20190504094440/https://davetheunissen.io/real-time-flight-map-w-azure-functions-cosmosdb-signalr/
